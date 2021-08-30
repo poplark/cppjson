@@ -31,6 +31,15 @@ static int test_pass = 0;
         EXPECT_EQ_INT(JSON_NULL, getType(&v));\
     } while(0)
 
+#define TEST_NUMBER(expect, json)\
+    do {\
+        pson_value v;\
+        v.type = JSON_FALSE;\
+        EXPECT_EQ_INT(PARSE_OK, parse(&v, json));\
+        EXPECT_EQ_INT(JSON_NUMBER, getType(&v));\
+        EXPECT_EQ_INT(expect, getNumber(&v));\
+    } while(0)
+
 static void test_parse_null() {
     // pson_value v;
     // v.type = JSON_FALSE;
@@ -100,8 +109,45 @@ static void test_parse() {
     test_parse_root_not_singular();
 }
 
+static void test_parse_number() {
+    TEST_NUMBER(0.0, "0");
+    TEST_NUMBER(0.0, "-0");
+    TEST_NUMBER(0.0, "-0.0");
+    TEST_NUMBER(1.0, "1");
+    TEST_NUMBER(-1.0, "-1");
+    TEST_NUMBER(1.5, "1.5");
+    TEST_NUMBER(-1.5, "-1.5");
+    TEST_NUMBER(3.1416, "3.1416");
+    TEST_NUMBER(1E10, "1E10");
+    TEST_NUMBER(1e10, "1e10");
+    TEST_NUMBER(1E+10, "1E+10");
+    TEST_NUMBER(1E-10, "1E-10");
+    TEST_NUMBER(-1E10, "-1E10");
+    TEST_NUMBER(-1e10, "-1e10");
+    TEST_NUMBER(-1E+10, "-1E+10");
+    TEST_NUMBER(-1E-10, "-1E-10");
+    TEST_NUMBER(1.234E+10, "1.234E+10");
+    TEST_NUMBER(1.234E-10, "1.234E-10");
+    TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
+}
+
+static void test_parse_invalid_value() {
+    /* ... */
+    /* invalid number */
+    TEST_ERROR(PARSE_INVALID_VALUE, "+0");
+    TEST_ERROR(PARSE_INVALID_VALUE, "+1");
+    TEST_ERROR(PARSE_INVALID_VALUE, ".123"); /* at least one digit before '.' */
+    TEST_ERROR(PARSE_INVALID_VALUE, "1.");   /* at least one digit after '.' */
+    TEST_ERROR(PARSE_INVALID_VALUE, "INF");
+    TEST_ERROR(PARSE_INVALID_VALUE, "inf");
+    TEST_ERROR(PARSE_INVALID_VALUE, "NAN");
+    TEST_ERROR(PARSE_INVALID_VALUE, "nan");
+}
+
 int main() {
     test_parse();
+    test_parse_number();
+    test_parse_invalid_value();
     std::cout<<test_pass<<"/"<<test_count<<" ("<<test_pass * 100.0 / test_count<<"%%) passed\n"<<std::endl;
     return main_ret;
 }
