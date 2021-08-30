@@ -34,14 +34,14 @@ static void test_parse_true() {
     pson_value v;
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_OK, parse(&v, "true"));
-    EXPECT_EQ_INT(JSON_NULL, getType(&v));
+    EXPECT_EQ_INT(JSON_TRUE, getType(&v));
 }
 
 static void test_parse_false() {
     pson_value v;
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_OK, parse(&v, "false"));
-    EXPECT_EQ_INT(JSON_NULL, getType(&v));
+    EXPECT_EQ_INT(JSON_FALSE, getType(&v));
 }
 
 static void test_parse_expect_value() {

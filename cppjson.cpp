@@ -24,6 +24,11 @@ namespace pson {
       return PARSE_INVALID_VALUE;
     }
     c->json += 3;
+    parseWhitespace(c);
+    // C语言标准字符串以'\0'结束，空字符串首字符为'\0'
+    if (c->json[0] != '\0') {
+      return PARSE_ROOT_NOT_SINGULAR;
+    }
     v->type = JSON_NULL;
     return PARSE_OK;
   }
@@ -34,7 +39,11 @@ namespace pson {
       return PARSE_INVALID_VALUE;
     }
     c->json += 3;
-    v->type = JSON_NULL;
+    parseWhitespace(c);
+    if (c->json[0] != '\0') {
+      return PARSE_ROOT_NOT_SINGULAR;
+    }
+    v->type = JSON_TRUE;
     return PARSE_OK;
   }
 
@@ -44,7 +53,11 @@ namespace pson {
       return PARSE_INVALID_VALUE;
     }
     c->json += 4;
-    v->type = JSON_NULL;
+    parseWhitespace(c);
+    if (c->json[0] != '\0') {
+      return PARSE_ROOT_NOT_SINGULAR;
+    }
+    v->type = JSON_FALSE;
     return PARSE_OK;
   }
 
