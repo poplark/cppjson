@@ -31,13 +31,15 @@ static int test_pass = 0;
         EXPECT_EQ_INT(JSON_NULL, getType(&v));\
     } while(0)
 
+#define EXPECT_EQ_DOUBLE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), expect, actual, "%lf")
+
 #define TEST_NUMBER(expect, json)\
     do {\
         pson_value v;\
         v.type = JSON_FALSE;\
         EXPECT_EQ_INT(PARSE_OK, parse(&v, json));\
         EXPECT_EQ_INT(JSON_NUMBER, getType(&v));\
-        EXPECT_EQ_INT(expect, getNumber(&v));\
+        EXPECT_EQ_DOUBLE(expect, getNumber(&v));\
     } while(0)
 
 static void test_parse_null() {
@@ -89,6 +91,16 @@ static void test_parse_invalid_value() {
 
     TEST_ERROR(PARSE_INVALID_VALUE, "nul");
     TEST_ERROR(PARSE_INVALID_VALUE, "?");
+
+    /* invalid number */
+    TEST_ERROR(PARSE_INVALID_VALUE, "+0");
+    TEST_ERROR(PARSE_INVALID_VALUE, "+1");
+    TEST_ERROR(PARSE_INVALID_VALUE, ".123"); /* at least one digit before '.' */
+    TEST_ERROR(PARSE_INVALID_VALUE, "1.");   /* at least one digit after '.' */
+    TEST_ERROR(PARSE_INVALID_VALUE, "INF");
+    TEST_ERROR(PARSE_INVALID_VALUE, "inf");
+    TEST_ERROR(PARSE_INVALID_VALUE, "NAN");
+    TEST_ERROR(PARSE_INVALID_VALUE, "nan");
 }
 
 static void test_parse_root_not_singular() {
@@ -131,23 +143,9 @@ static void test_parse_number() {
     TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
 }
 
-static void test_parse_invalid_value() {
-    /* ... */
-    /* invalid number */
-    TEST_ERROR(PARSE_INVALID_VALUE, "+0");
-    TEST_ERROR(PARSE_INVALID_VALUE, "+1");
-    TEST_ERROR(PARSE_INVALID_VALUE, ".123"); /* at least one digit before '.' */
-    TEST_ERROR(PARSE_INVALID_VALUE, "1.");   /* at least one digit after '.' */
-    TEST_ERROR(PARSE_INVALID_VALUE, "INF");
-    TEST_ERROR(PARSE_INVALID_VALUE, "inf");
-    TEST_ERROR(PARSE_INVALID_VALUE, "NAN");
-    TEST_ERROR(PARSE_INVALID_VALUE, "nan");
-}
-
 int main() {
     test_parse();
     test_parse_number();
-    test_parse_invalid_value();
     std::cout<<test_pass<<"/"<<test_count<<" ("<<test_pass * 100.0 / test_count<<"%%) passed\n"<<std::endl;
     return main_ret;
 }

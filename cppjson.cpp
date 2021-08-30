@@ -1,6 +1,7 @@
 #include "cppjson.h"
 #include <assert.h>
 #include <iostream>
+#include <stdlib.h>
 
 // 宏里有多过一个语句（statement），就需要用 do { /*...*/ } while(0) 包裹成单个语句
 #define Expect(c, ch) do { assert(*c->json == (ch)); c->json++; } while(0)
@@ -48,6 +49,33 @@ namespace pson {
     return PARSE_OK;
   }
 
+  static int parseNumber(pson_context *c, pson_value *v) {
+    switch (c->json[0]) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case '-':
+        break;
+      default:
+        return PARSE_INVALID_VALUE;
+    }
+    char *end;
+    v->n = strtod(c->json, &end);
+    if (c->json == end) {
+      return PARSE_INVALID_VALUE;
+    }
+    c->json = end;
+    v->type = JSON_NUMBER;
+    return PARSE_OK;
+  }
+
   static int parseValue(pson_context *c, pson_value *v) {
     // switch (c->json) { // ????
     switch (*c->json) {
@@ -55,7 +83,7 @@ namespace pson {
       case 't': return parseTrue(c, v);
       case 'f': return parseFalse(c, v);
       case '\0': return PARSE_EXPECT_VALUE;
-      default: return PARSE_INVALID_VALUE;
+      default: return parseNumber(c, v);
     }
   }
 
