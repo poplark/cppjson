@@ -81,4 +81,9 @@ namespace pson {
     assert(v != NULL);
     return v->type;
   }
+
+  double getNumber(const pson_value *v) {
+    assert(v != NULL && v->type == JSON_NUMBER);
+    return v->n;
+  }
 }

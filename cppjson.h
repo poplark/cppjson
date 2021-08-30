@@ -14,6 +14,7 @@ namespace pson {
   } pson_type;
 
   typedef struct {
+    double n;
     pson_type type;
   } pson_value;
 
@@ -27,5 +28,7 @@ namespace pson {
   int parse(pson_value *v, const char* json);
 
   pson_type getType(const pson_value * v);
+
+  double getNumber(const pson_value *v);
 }
 #endif
