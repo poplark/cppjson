@@ -1,7 +1,8 @@
-#ifndef CPPJSON_H__
-#define CPPJSON_H__
+// 利用宏加入 include 防范（include guard）
+#ifndef PSON_H__
+#define PSON_H__
 
-namespace cppjson {
+namespace pson {
   typedef enum {
     JSON_NULL,
     JSON_FALSE,
@@ -10,11 +11,11 @@ namespace cppjson {
     JSON_STRING,
     JSON_ARRAY,
     JSON_OBJECT
-  } json_type;
+  } pson_type;
 
   typedef struct {
-    json_type type;
-  } json_value;
+    pson_type type;
+  } pson_value;
 
   enum {
     PARSE_OK = 0,
@@ -23,8 +24,8 @@ namespace cppjson {
     PARSE_ROOT_NOT_SINGULAR
   };
 
-  int parse(json_value *v, const char* json);
+  int parse(pson_value *v, const char* json);
 
-  json_type getType(const json_value * v);
+  pson_type getType(const pson_value * v);
 }
 #endif

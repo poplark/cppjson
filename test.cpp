@@ -4,7 +4,7 @@
 #include <string.h>
 #include "cppjson.h"
 
-using namespace cppjson;
+using namespace pson;
 
 static int main_ret = 0;
 static int test_count = 0;
@@ -24,14 +24,28 @@ static int test_pass = 0;
 #define EXPECT_EQ_INT(expect, actual) EXPECT_EQ_BASE((expect) == (actual), expect, actual, "%d")
 
 static void test_parse_null() {
-    json_value v;
+    pson_value v;
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_OK, parse(&v, "null"));
     EXPECT_EQ_INT(JSON_NULL, getType(&v));
 }
 
+static void test_parse_true() {
+    pson_value v;
+    v.type = JSON_FALSE;
+    EXPECT_EQ_INT(PARSE_OK, parse(&v, "true"));
+    EXPECT_EQ_INT(JSON_NULL, getType(&v));
+}
+
+static void test_parse_false() {
+    pson_value v;
+    v.type = JSON_FALSE;
+    EXPECT_EQ_INT(PARSE_OK, parse(&v, "false"));
+    EXPECT_EQ_INT(JSON_NULL, getType(&v));
+}
+
 static void test_parse_expect_value() {
-    json_value v;
+    pson_value v;
 
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_EXPECT_VALUE, parse(&v, ""));
@@ -43,7 +57,7 @@ static void test_parse_expect_value() {
 }
 
 static void test_parse_invalid_value() {
-    json_value v;
+    pson_value v;
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_INVALID_VALUE, parse(&v, "nul"));
     EXPECT_EQ_INT(JSON_NULL, getType(&v));
@@ -54,7 +68,7 @@ static void test_parse_invalid_value() {
 }
 
 static void test_parse_root_not_singular() {
-    json_value v;
+    pson_value v;
     v.type = JSON_FALSE;
     EXPECT_EQ_INT(PARSE_ROOT_NOT_SINGULAR, parse(&v, "null x"));
     EXPECT_EQ_INT(JSON_NULL, getType(&v));
@@ -62,6 +76,8 @@ static void test_parse_root_not_singular() {
 
 static void test_parse() {
     test_parse_null();
+    test_parse_true();
+    test_parse_false();
     test_parse_expect_value();
     test_parse_invalid_value();
     test_parse_root_not_singular();

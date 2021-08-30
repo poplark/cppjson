@@ -7,5 +7,5 @@ if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 add_library(cppjson cppjson.cpp)
-add_executable(cppjson_test test.cpp)
-target_link_libraries(cppjson_test cppjson)
+add_executable(pson_test test.cpp)
+target_link_libraries(pson_test cppjson)

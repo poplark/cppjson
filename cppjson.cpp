@@ -2,14 +2,15 @@
 #include <assert.h>
 #include <iostream>
 
+// 宏里有多过一个语句（statement），就需要用 do { /*...*/ } while(0) 包裹成单个语句
 #define Expect(c, ch) do { assert(*c->json == (ch)); c->json++; } while(0)
 
-namespace cppjson {
+namespace pson {
   typedef struct {
     const char* json;
-  } json_context;
+  } pson_context;
 
-  static void parseWhitespace(json_context *c) {
+  static void parseWhitespace(pson_context *c) {
     const char *p = c->json;
     while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') {
       p++;
@@ -17,7 +18,7 @@ namespace cppjson {
     c->json = p;
   }
 
-  static int parseNull(json_context *c, json_value *v) {
+  static int parseNull(pson_context *c, pson_value *v) {
     Expect(c, 'n');
     if (c->json[0] != 'u' || c->json[1] != 'l' || c->json[2] != 'l') {
       return PARSE_INVALID_VALUE;
@@ -27,17 +28,39 @@ namespace cppjson {
     return PARSE_OK;
   }
 
-  static int parseValue(json_context *c, json_value *v) {
+  static int parseTrue(pson_context *c, pson_value *v) {
+    Expect(c, 't');
+    if (c->json[0] != 'r' || c->json[1] != 'u' || c->json[2] != 'e') {
+      return PARSE_INVALID_VALUE;
+    }
+    c->json += 3;
+    v->type = JSON_NULL;
+    return PARSE_OK;
+  }
+
+  static int parseFalse(pson_context *c, pson_value *v) {
+    Expect(c, 'f');
+    if (c->json[0] != 'a' || c->json[1] != 'l' || c->json[2] != 's' || c->json[3] != 'e') {
+      return PARSE_INVALID_VALUE;
+    }
+    c->json += 4;
+    v->type = JSON_NULL;
+    return PARSE_OK;
+  }
+
+  static int parseValue(pson_context *c, pson_value *v) {
     // switch (c->json) { // ????
     switch (*c->json) {
       case 'n': return parseNull(c, v);
+      case 't': return parseTrue(c, v);
+      case 'f': return parseFalse(c, v);
       case '\0': return PARSE_EXPECT_VALUE;
       default: return PARSE_INVALID_VALUE;
     }
   }
 
-  int parse(json_value *v, const char* json) {
-    json_context c;
+  int parse(pson_value *v, const char* json) {
+    pson_context c;
     assert(v != NULL);
     c.json = json;
     v->type = JSON_NULL;
@@ -45,7 +68,7 @@ namespace cppjson {
     return parseValue(&c, v);
   }
 
-  json_type getType(const json_value *v) {
+  pson_type getType(const pson_value *v) {
     assert(v != NULL);
     return v->type;
   }
