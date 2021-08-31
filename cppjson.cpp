@@ -19,6 +19,9 @@ namespace pson {
     c->json = p;
   }
 
+  /**
+   * @deprecated parseLiteral 代替
+   */
   static int parseNull(pson_context *c, pson_value *v) {
     Expect(c, 'n');
     if (c->json[0] != 'u' || c->json[1] != 'l' || c->json[2] != 'l') {
@@ -29,6 +32,9 @@ namespace pson {
     return PARSE_OK;
   }
 
+  /**
+   * @deprecated parseLiteral 代替
+   */
   static int parseTrue(pson_context *c, pson_value *v) {
     Expect(c, 't');
     if (c->json[0] != 'r' || c->json[1] != 'u' || c->json[2] != 'e') {
@@ -39,6 +45,9 @@ namespace pson {
     return PARSE_OK;
   }
 
+  /**
+   * @deprecated parseLiteral 代替
+   */
   static int parseFalse(pson_context *c, pson_value *v) {
     Expect(c, 'f');
     if (c->json[0] != 'a' || c->json[1] != 'l' || c->json[2] != 's' || c->json[3] != 'e') {
@@ -46,6 +55,19 @@ namespace pson {
     }
     c->json += 4;
     v->type = JSON_FALSE;
+    return PARSE_OK;
+  }
+  
+  static int parseLiteral(pson_context *c, pson_value *v, const char *expect, pson_type t) {
+    int i = 0;
+    while (expect[i] != '\0') {
+      if (c->json[i] != expect[i]) {
+        return PARSE_INVALID_VALUE;
+      }
+      i++;
+    }
+    c->json += i;
+    v->type = t;
     return PARSE_OK;
   }
 
@@ -79,9 +101,10 @@ namespace pson {
   static int parseValue(pson_context *c, pson_value *v) {
     // switch (c->json) { // ????
     switch (*c->json) {
-      case 'n': return parseNull(c, v);
-      case 't': return parseTrue(c, v);
-      case 'f': return parseFalse(c, v);
+      // case 'n': return parseNull(c, v);
+      case 'n': return parseLiteral(c, v, "null", JSON_NULL);
+      case 't': return parseLiteral(c, v, "true", JSON_TRUE);
+      case 'f': return parseLiteral(c, v, "false", JSON_FALSE);
       case '\0': return PARSE_EXPECT_VALUE;
       default: return parseNumber(c, v);
     }
