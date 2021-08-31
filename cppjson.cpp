@@ -59,7 +59,7 @@ namespace pson {
   }
   
   static int parseLiteral(pson_context *c, pson_value *v, const char *expect, pson_type t) {
-    int i = 0;
+    size_t i = 0;
     while (expect[i] != '\0') {
       if (c->json[i] != expect[i]) {
         return PARSE_INVALID_VALUE;
@@ -101,7 +101,6 @@ namespace pson {
   static int parseValue(pson_context *c, pson_value *v) {
     // switch (c->json) { // ????
     switch (*c->json) {
-      // case 'n': return parseNull(c, v);
       case 'n': return parseLiteral(c, v, "null", JSON_NULL);
       case 't': return parseLiteral(c, v, "true", JSON_TRUE);
       case 'f': return parseLiteral(c, v, "false", JSON_FALSE);
