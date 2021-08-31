@@ -64,6 +64,28 @@ static void test_parse_false() {
     EXPECT_EQ_INT(JSON_FALSE, getType(&v));
 }
 
+static void test_parse_number() {
+    TEST_NUMBER(0.0, "0");
+    TEST_NUMBER(0.0, "-0");
+    TEST_NUMBER(0.0, "-0.0");
+    TEST_NUMBER(1.0, "1");
+    TEST_NUMBER(-1.0, "-1");
+    TEST_NUMBER(1.5, "1.5");
+    TEST_NUMBER(-1.5, "-1.5");
+    TEST_NUMBER(3.1416, "3.1416");
+    TEST_NUMBER(1E10, "1E10");
+    TEST_NUMBER(1e10, "1e10");
+    TEST_NUMBER(1E+10, "1E+10");
+    TEST_NUMBER(1E-10, "1E-10");
+    TEST_NUMBER(-1E10, "-1E10");
+    TEST_NUMBER(-1e10, "-1e10");
+    TEST_NUMBER(-1E+10, "-1E+10");
+    TEST_NUMBER(-1E-10, "-1E-10");
+    TEST_NUMBER(1.234E+10, "1.234E+10");
+    TEST_NUMBER(1.234E-10, "1.234E-10");
+    TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
+}
+
 static void test_parse_expect_value() {
     // pson_value v;
 
@@ -92,6 +114,7 @@ static void test_parse_invalid_value() {
     TEST_ERROR(PARSE_INVALID_VALUE, "nul");
     TEST_ERROR(PARSE_INVALID_VALUE, "?");
 
+#if 0
     /* invalid number */
     TEST_ERROR(PARSE_INVALID_VALUE, "+0");
     TEST_ERROR(PARSE_INVALID_VALUE, "+1");
@@ -101,6 +124,7 @@ static void test_parse_invalid_value() {
     TEST_ERROR(PARSE_INVALID_VALUE, "inf");
     TEST_ERROR(PARSE_INVALID_VALUE, "NAN");
     TEST_ERROR(PARSE_INVALID_VALUE, "nan");
+#endif
 }
 
 static void test_parse_root_not_singular() {
@@ -110,42 +134,35 @@ static void test_parse_root_not_singular() {
     // EXPECT_EQ_INT(JSON_NULL, getType(&v));
 
     TEST_ERROR(PARSE_ROOT_NOT_SINGULAR, "null x");
+
+#if 0
+    /* invalid number */
+    TEST_ERROR(PARSE_ROOT_NOT_SINGULAR, "0123"); /* after zero should be '.' , 'E' , 'e' or nothing */
+    TEST_ERROR(PARSE_ROOT_NOT_SINGULAR, "0x0");
+    TEST_ERROR(PARSE_ROOT_NOT_SINGULAR, "0x123");
+#endif
+}
+
+static void test_parse_number_too_big() {
+#if 0
+    TEST_ERROR(PARSE_NUMBER_TOO_BIG, "1e309");
+    TEST_ERROR(PARSE_NUMBER_TOO_BIG, "-1e309");
+#endif
 }
 
 static void test_parse() {
     test_parse_null();
     test_parse_true();
     test_parse_false();
+    test_parse_number();
     test_parse_expect_value();
     test_parse_invalid_value();
     test_parse_root_not_singular();
-}
-
-static void test_parse_number() {
-    TEST_NUMBER(0.0, "0");
-    TEST_NUMBER(0.0, "-0");
-    TEST_NUMBER(0.0, "-0.0");
-    TEST_NUMBER(1.0, "1");
-    TEST_NUMBER(-1.0, "-1");
-    TEST_NUMBER(1.5, "1.5");
-    TEST_NUMBER(-1.5, "-1.5");
-    TEST_NUMBER(3.1416, "3.1416");
-    TEST_NUMBER(1E10, "1E10");
-    TEST_NUMBER(1e10, "1e10");
-    TEST_NUMBER(1E+10, "1E+10");
-    TEST_NUMBER(1E-10, "1E-10");
-    TEST_NUMBER(-1E10, "-1E10");
-    TEST_NUMBER(-1e10, "-1e10");
-    TEST_NUMBER(-1E+10, "-1E+10");
-    TEST_NUMBER(-1E-10, "-1E-10");
-    TEST_NUMBER(1.234E+10, "1.234E+10");
-    TEST_NUMBER(1.234E-10, "1.234E-10");
-    TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
+    test_parse_number_too_big();
 }
 
 int main() {
     test_parse();
-    test_parse_number();
     std::cout<<test_pass<<"/"<<test_count<<" ("<<test_pass * 100.0 / test_count<<"%%) passed\n"<<std::endl;
     return main_ret;
 }
