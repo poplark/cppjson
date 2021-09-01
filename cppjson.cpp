@@ -5,6 +5,24 @@
 
 // 宏里有多过一个语句（statement），就需要用 do { /*...*/ } while(0) 包裹成单个语句
 #define Expect(c, ch) do { assert(*c->json == (ch)); c->json++; } while(0)
+#define IsDigit1To9(ch) ((ch) >= '1' && (ch) <= '9')
+// #define IsDigit1To9(ch) do {\
+//   switch (ch) {\
+//     case '1':\
+//     case '2':\
+//     case '3':\
+//     case '4':\
+//     case '5':\
+//     case '6':\
+//     case '7':\
+//     case '8':\
+//     case '9':\
+//       return true;\
+//     default:\
+//       return false;\
+//   }\
+// } while(0)
+#define IsDigit(ch) ((ch) >= '0' && (ch) <= '9')
 
 namespace pson {
   typedef struct {
@@ -72,22 +90,27 @@ namespace pson {
   }
 
   static int parseNumber(pson_context *c, pson_value *v) {
-    switch (c->json[0]) {
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-      case '-':
-        break;
-      default:
-        return PARSE_INVALID_VALUE;
+    const char *p = c->json;
+    if (*p == '-') p++; // 负号 - 直接跳过
+    if (*p == '0') {
+      // 0 - 直接跳过
+      p++;
+    } else {
+      if (!IsDigit1To9(*p)) return PARSE_INVALID_VALUE;
+      for (p++; IsDigit(*p); p++);
     }
+    if (*p == '.') {
+      p++;
+      if (!IsDigit(*p)) return PARSE_INVALID_VALUE;
+      for (p++; IsDigit(*p); p++);
+    }
+    if (*p == 'e' || *p == 'E') {
+      p++;
+      if (*p == '+' || *p == '-') p++;
+      if (!IsDigit(*p)) return PARSE_INVALID_VALUE;
+      for (p++; IsDigit(*p); p++);
+    }
+    errno = 0;
     char *end;
     v->n = strtod(c->json, &end);
     if (c->json == end) {
