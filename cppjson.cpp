@@ -1,5 +1,7 @@
 #include "cppjson.h"
 #include <assert.h>
+#include <errno.h>   /* errno, ERANGE */
+#include <math.h>    /* HUGE_VAL */
 #include <iostream>
 #include <stdlib.h>
 
@@ -92,8 +94,7 @@ namespace pson {
   static int parseNumber(pson_context *c, pson_value *v) {
     const char *p = c->json;
     if (*p == '-') p++; // 负号 - 直接跳过
-    if (*p == '0') {
-      // 0 - 直接跳过
+    if (*p == '0') { // 0 - 直接跳过
       p++;
     } else {
       if (!IsDigit1To9(*p)) return PARSE_INVALID_VALUE;
@@ -110,14 +111,17 @@ namespace pson {
       if (!IsDigit(*p)) return PARSE_INVALID_VALUE;
       for (p++; IsDigit(*p); p++);
     }
-    errno = 0;
+    errno = 0; // ???
     char *end;
     v->n = strtod(c->json, &end);
-    if (c->json == end) {
-      return PARSE_INVALID_VALUE;
-    }
-    c->json = end;
+    // if (c->json == end) {
+    //   return PARSE_INVALID_VALUE;
+    // }
+    // c->json = end;
+    if (errno == ERANGE && (v->n == HUGE_VAL || v->n == -HUGE_VAL))
+      return PARSE_NUMBER_TOO_BIG;
     v->type = JSON_NUMBER;
+    c->json = p;
     return PARSE_OK;
   }
 
