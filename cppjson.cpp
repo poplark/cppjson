@@ -111,13 +111,14 @@ namespace pson {
       if (!IsDigit(*p)) return PARSE_INVALID_VALUE;
       for (p++; IsDigit(*p); p++);
     }
-    errno = 0; // ???
-    char *end;
-    v->n = strtod(c->json, &end);
+    // char *end;
+    // v->n = strtod(c->json, &end);
     // if (c->json == end) {
     //   return PARSE_INVALID_VALUE;
     // }
     // c->json = end;
+    errno = 0; // ???
+    v->n = strtod(c->json, NULL);
     if (errno == ERANGE && (v->n == HUGE_VAL || v->n == -HUGE_VAL))
       return PARSE_NUMBER_TOO_BIG;
     v->type = JSON_NUMBER;

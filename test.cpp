@@ -140,10 +140,10 @@ static void test_parse_root_not_singular() {
 }
 
 static void test_parse_number_too_big() {
-#if 0
+// #if 0
     TEST_ERROR(PARSE_NUMBER_TOO_BIG, "1e309");
     TEST_ERROR(PARSE_NUMBER_TOO_BIG, "-1e309");
-#endif
+// #endif
 }
 
 static void test_parse() {
