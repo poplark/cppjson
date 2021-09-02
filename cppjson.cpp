@@ -119,6 +119,8 @@ namespace pson {
     // c->json = end;
     errno = 0; // ???
     v->n = strtod(c->json, NULL);
+    // char *end;
+    // v->n = strtod(c->json, &end);
     if (errno == ERANGE && (v->n == HUGE_VAL || v->n == -HUGE_VAL))
       return PARSE_NUMBER_TOO_BIG;
     v->type = JSON_NUMBER;
