@@ -5,28 +5,28 @@
 #include <iostream>
 #include <stdlib.h>
 
-// 宏里有多过一个语句（statement），就需要用 do { /*...*/ } while(0) 包裹成单个语句
-#define Expect(c, ch) do { assert(*c->json == (ch)); c->json++; } while(0)
-#define IsDigit1To9(ch) ((ch) >= '1' && (ch) <= '9')
-// #define IsDigit1To9(ch) do {\
-//   switch (ch) {\
-//     case '1':\
-//     case '2':\
-//     case '3':\
-//     case '4':\
-//     case '5':\
-//     case '6':\
-//     case '7':\
-//     case '8':\
-//     case '9':\
-//       return true;\
-//     default:\
-//       return false;\
-//   }\
-// } while(0)
-#define IsDigit(ch) ((ch) >= '0' && (ch) <= '9')
-
 namespace pson {
+  // 宏里有多过一个语句（statement），就需要用 do { /*...*/ } while(0) 包裹成单个语句
+  #define Expect(c, ch) do { assert(*c->json == (ch)); c->json++; } while(0)
+  #define IsDigit1To9(ch) ((ch) >= '1' && (ch) <= '9')
+  // #define IsDigit1To9(ch) do {\
+  //   switch (ch) {\
+  //     case '1':\
+  //     case '2':\
+  //     case '3':\
+  //     case '4':\
+  //     case '5':\
+  //     case '6':\
+  //     case '7':\
+  //     case '8':\
+  //     case '9':\
+  //       return true;\
+  //     default:\
+  //       return false;\
+  //   }\
+  // } while(0)
+  #define IsDigit(ch) ((ch) >= '0' && (ch) <= '9')
+
   typedef struct {
     const char* json;
   } pson_context;
@@ -151,6 +151,7 @@ namespace pson {
       parseWhitespace(&c);
       // C语言标准字符串以'\0'结束，空字符串首字符为'\0'
       if (*c.json != '\0') {
+        v->type = JSON_NULL;
         return PARSE_ROOT_NOT_SINGULAR;
       }
     }
